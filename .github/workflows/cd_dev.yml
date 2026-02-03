@@ -21,7 +21,8 @@ jobs:
 
       - name: SSH into server and deploy
         run: |
-          ssh -i DevKey.pem \
+          ssh -o StrictHostKeyChecking=no \
+              -i DevKey.pem \
               ubuntu@${{ vars.DEV_IP }} << 'EOF'
 
             cd Staging_Dev_Prod_Depolyment
