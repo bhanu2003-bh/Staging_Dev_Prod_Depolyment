@@ -29,9 +29,6 @@ jobs:
             git pull
             pnpm install
             pnpm run build
-
-            pm2 restart Frontend || pm2 start Frontend
-            pm2 restart Backend || pm2 start Backend
-            pm2 restart Websocket || pm2 start Websocket
+            pm2 restart all
 
           EOF
