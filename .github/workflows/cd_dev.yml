@@ -1,0 +1,37 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  redeploy_everything:
+    name: Deploy everything to staging aws ec2 instance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > DevKey.pem
+          chmod 600 DevKey.pem
+
+      - name: SSH into server and deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              -i DevKey.pem \
+              ubuntu@${{ vars.DEV_IP }} << 'EOF'
+
+            cd Staging_Dev_Prod_Depolyment
+            git pull
+            pnpm install
+            pnpm run build
+
+            pm2 restart Frontend || pm2 start Frontend
+            pm2 restart Backend || pm2 start Backend
+            pm2 restart Websocket || pm2 start Websocket
+
+          EOF
